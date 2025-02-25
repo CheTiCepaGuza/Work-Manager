@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Configuration;
 using System.Xml.Linq;
+using WorkManager;
 
 namespace WorkManager
 
@@ -71,14 +72,7 @@ namespace WorkManager
         {
             ProductionPerMonth = 0;
 
-            foreach (Worker worker in Workers)
-            {
-
-                ProductionPerMonth += worker.ProductionRate;
-
-            }
-
-            ProductionPerMonth *= 100;
+            ProductionPerMonth = Workers.Sum(w => w.ProductionRate) * 100;
 
         }
 
@@ -390,6 +384,21 @@ namespace WorkManager
         }
 
 
+        public void DeptMenu(Department deps)
+        {
+            Console.WriteLine($"Current: {deps.DName}");
+            Console.WriteLine("------DEPT-MENU------>");
+            Console.WriteLine("[A]Add Worker");
+            Console.WriteLine("[R]Remove Worker");
+            Console.WriteLine("[E]Edit Worker");
+            Console.WriteLine("[D]Display(ALL,CEO,Manager,Employee)");
+            Console.WriteLine("[B]Back)");
+
+        }
+
+
+
+
         public void DeptViewr()
         {
             ConsoleKeyInfo key;
@@ -461,12 +470,20 @@ namespace WorkManager
 
                                 case ConsoleKey.G:
 
-                                    Console.Clear();
-                                    DisplayDepartments();
-                                    Console.WriteLine();
-                                    Console.Write("Pick Department To Change: ");
-                                    string name2 = Console.ReadLine();
-                                    deps = Departments.Where(n => n.DName == name2).ToList();
+                                    if (Departments.Count > 1)
+                                    {
+                                        Console.Clear();
+                                        DisplayDepartments();
+                                        Console.WriteLine();
+                                        Console.Write("Pick Department To Change: ");
+                                        string name2 = Console.ReadLine();
+                                        deps = Departments.Where(n => n.DName == name2).ToList();
+                                    }
+                                    else
+                                    {
+                                        Console.Clear();
+                                        Console.WriteLine("Only one dept!!");
+                                    }
                                     break;
 
                                 case ConsoleKey.D:
@@ -503,6 +520,93 @@ namespace WorkManager
             }
 
         }
+
+        public void DeptViewr(Department deps)
+        {
+            ConsoleKeyInfo key;
+            ConsoleKeyInfo lastClick = new ConsoleKeyInfo();
+
+            while (true)
+            {
+                Console.Clear();
+                if (lastClick.Key == ConsoleKey.B)
+                {
+
+                    break;
+
+                }
+
+                while (true)
+                {
+                    DeptMenu(deps);
+                    Console.WriteLine("Enter Pick: ");
+                    Console.WriteLine();
+                    key = Console.ReadKey(intercept: true);
+                    lastClick = key;
+                    if (key.Key == ConsoleKey.B)
+                    {
+
+                        Console.Clear();
+                        return;
+
+                    }
+                    else if (key.Key == ConsoleKey.A || key.Key == ConsoleKey.R || key.Key == ConsoleKey.V || key.Key == ConsoleKey.D || key.Key == ConsoleKey.E)
+                    {
+
+                        switch (key.Key)
+                        {
+
+                            case ConsoleKey.A:
+                                deps.AddWorker(deps);
+                                Console.Clear();
+                                Console.WriteLine($"{deps.Workers.Last().Name} was added in {deps.DName}");
+                                Console.WriteLine();
+                                break;
+
+                            case ConsoleKey.R:
+                                Console.Write("Enter name: ");
+                                string myName = Console.ReadLine();
+                                deps.RemoveWorker(myName);
+                                break;
+
+                            case ConsoleKey.E:
+
+                                Console.Clear();
+                                deps.DisplayBy("all");
+                                Console.WriteLine();
+                                Console.Write("Enter name: ");
+                                string myName1 = Console.ReadLine();
+                                deps.EditWorker(myName1);
+                                break;
+
+                            case ConsoleKey.D:
+                                Console.WriteLine("[ALL,CEO,Manager,Employee] Pick: ");
+                                string pick = Console.ReadLine();
+                                Console.Clear();
+                                deps.DisplayBy(pick);
+
+                                break;
+
+                        }
+
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        Console.WriteLine("!!Wrong input!!");
+                        Console.WriteLine();
+                    }
+
+                }
+
+
+            }
+
+
+
+        }
+
+
 
         public void MainMenu()
         {
@@ -548,7 +652,26 @@ namespace WorkManager
                             break;
 
                         case ConsoleKey.V:
-                            DeptViewr();
+
+                            if (Departments.Count == 1)
+                            {
+
+
+                                DeptViewr(Departments.First());
+
+
+                            }
+                            else if (Departments.Count > 0)
+                            {
+
+
+                                DeptViewr();
+
+                            }
+                            else
+                            {
+                                Console.Clear();
+                            }
                             break;
 
 
@@ -584,30 +707,4 @@ namespace WorkManager
             Worker manager = new Worker("Maria Ivanova", "Manager", 3000, deps);
             Worker employee = new Worker("Georgi Dimitrov", "Employee", 2000, deps);
 
-            Worker ceo2 = new Worker("Stefan Nikolov", "CEO", 5500, deps1);
-            Worker manager2 = new Worker("Elena Petrova", "Manager", 3200, deps1);
-            Worker employee2 = new Worker("Nikola Ivanov", "Employee", 2100, deps1);
-
-            deps.Workers.Add(ceo);
-            deps.Workers.Add(manager);
-            deps.Workers.Add(employee);
-
-            deps1.Workers.Add(manager2);
-            deps1.Workers.Add(ceo2);
-            deps1.Workers.Add(employee2);
-
-            deps.ProductionUpdate();
-            deps1.ProductionUpdate();
-
-            wrwr.Departments.Add(deps);
-            wrwr.Departments.Add(deps1);
-
-
-            wrwr.MainMenu();
-
-
-
-        }
-
-    }
-}
+            Worker ceo2 = new Worker(
