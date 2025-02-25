@@ -99,13 +99,13 @@ namespace WorkManager
         public void RemoveWorker(string name)
         {
 
-            List<Worker> search = Workers.Where(n => n.Name == name).ToList();
-            if (search.Count > 0)
+            Worker search = Workers.Where(n => n.Name == name).FirstOrDefault();
+            if (search != null)
             {
                 Console.Clear();
-                Workers.Remove(search[0]);
-                Console.WriteLine($"{search[0].Name} was removed from {search[0].Department.DName}");
-
+                Workers.Remove(search);
+                Console.WriteLine($"{search.Name} was removed from {search.Department.DName}");
+                ProductionUpdate();
             }
             else
             {
@@ -113,14 +113,14 @@ namespace WorkManager
                 Console.WriteLine("Worker not found");
             }
 
-            ProductionUpdate();
+
 
         }
         public void EditWorker(string name)
         {
 
-            List<Worker> search = Workers.Where(n => n.Name == name).ToList();
-            if (search.Count > 0)
+            Worker search = Workers.Where(n => n.Name == name).FirstOrDefault();
+            if (search != null)
             {
 
                 Console.WriteLine("1 - name");
@@ -135,7 +135,7 @@ namespace WorkManager
                     if (now == 0)
                     {
                         Console.Clear();
-                        Console.WriteLine($"{search[0]} -- Changed");
+                        Console.WriteLine($"{search} -- Changed");
                         Console.WriteLine();
                         break;
 
@@ -147,7 +147,7 @@ namespace WorkManager
 
                             Console.Write("New Name: ");
 
-                            search[0].Name = Console.ReadLine();
+                            search.Name = Console.ReadLine();
 
                             break;
 
@@ -155,7 +155,7 @@ namespace WorkManager
 
                             Console.Write("New Salary: ");
 
-                            search[0].Salary = double.Parse(Console.ReadLine());
+                            search.Salary = double.Parse(Console.ReadLine());
 
                             break;
 
@@ -175,7 +175,7 @@ namespace WorkManager
                     {
 
 
-                        Workers[i] = search[0];
+                        Workers[i] = search;
                         break;
 
                     }
@@ -386,6 +386,7 @@ namespace WorkManager
 
         public void DeptMenu(Department deps)
         {
+            Console.WriteLine();
             Console.WriteLine($"Current: {deps.DName}");
             Console.WriteLine("------DEPT-MENU------>");
             Console.WriteLine("[A]Add Worker");
@@ -413,7 +414,7 @@ namespace WorkManager
 
                 Console.Write("Pick Department: ");
                 string name = Console.ReadLine();
-                List<Department> deps = Departments.Where(n => n.DName == name).ToList();
+                Department deps = Departments.Where(n => n.DName == name).FirstOrDefault();
                 if (name == "end")
                 {
 
@@ -421,7 +422,7 @@ namespace WorkManager
                     break;
 
                 }
-                if (deps.Count > 0)
+                if (deps != null)
                 {
 
 
@@ -446,26 +447,26 @@ namespace WorkManager
                             {
 
                                 case ConsoleKey.A:
-                                    deps[0].AddWorker(deps[0]);
+                                    deps.AddWorker(deps);
                                     Console.Clear();
-                                    Console.WriteLine($"{deps[0].Workers.Last().Name} was added in {deps[0].DName}");
+                                    Console.WriteLine($"{deps.Workers.Last().Name} was added in {deps.DName}");
                                     Console.WriteLine();
                                     break;
 
                                 case ConsoleKey.R:
                                     Console.Write("Enter name: ");
                                     string myName = Console.ReadLine();
-                                    deps[0].RemoveWorker(myName);
+                                    deps.RemoveWorker(myName);
                                     break;
 
                                 case ConsoleKey.E:
 
                                     Console.Clear();
-                                    deps[0].DisplayBy("all");
+                                    deps.DisplayBy("all");
                                     Console.WriteLine();
                                     Console.Write("Enter name: ");
                                     string myName1 = Console.ReadLine();
-                                    deps[0].EditWorker(myName1);
+                                    deps.EditWorker(myName1);
                                     break;
 
                                 case ConsoleKey.G:
@@ -477,7 +478,7 @@ namespace WorkManager
                                         Console.WriteLine();
                                         Console.Write("Pick Department To Change: ");
                                         string name2 = Console.ReadLine();
-                                        deps = Departments.Where(n => n.DName == name2).ToList();
+                                        deps = Departments.Where(n => n.DName == name2).FirstOrDefault();
                                     }
                                     else
                                     {
@@ -490,7 +491,7 @@ namespace WorkManager
                                     Console.WriteLine("[ALL,CEO,Manager,Employee] Pick: ");
                                     string pick = Console.ReadLine();
                                     Console.Clear();
-                                    deps[0].DisplayBy(pick);
+                                    deps.DisplayBy(pick);
 
                                     break;
 
