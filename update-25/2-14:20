@@ -108,12 +108,14 @@ namespace WorkManager
             List<Worker> search = Workers.Where(n => n.Name == name).ToList();
             if (search.Count > 0)
             {
-
+                Console.Clear();
                 Workers.Remove(search[0]);
+                Console.WriteLine($"{search[0].Name} was removed from {search[0].Department.DName}");
 
             }
             else
             {
+                Console.Clear();
                 Console.WriteLine("Worker not found");
             }
 
@@ -135,9 +137,11 @@ namespace WorkManager
                 {
                     Console.Write("To Edit:");
                     int now = int.Parse(Console.ReadLine());
+
                     if (now == 0)
                     {
-
+                        Console.Clear();
+                        Console.WriteLine($"{search[0]} -- Changed");
                         Console.WriteLine();
                         break;
 
