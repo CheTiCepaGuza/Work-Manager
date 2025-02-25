@@ -86,7 +86,6 @@ namespace WorkManager
         {
 
             Console.WriteLine("!--Add--Worker--!");
-            Console.WriteLine();
             Console.Write("Name:");
             string name = Console.ReadLine();
 
@@ -107,11 +106,15 @@ namespace WorkManager
         {
 
             List<Worker> search = Workers.Where(n => n.Name == name).ToList();
-            if (search != null)
+            if (search.Count > 0)
             {
 
                 Workers.Remove(search[0]);
 
+            }
+            else
+            {
+                Console.WriteLine("Worker not found");
             }
 
             ProductionUpdate();
@@ -121,14 +124,16 @@ namespace WorkManager
         {
 
             List<Worker> search = Workers.Where(n => n.Name == name).ToList();
-            if (search != null)
+            if (search.Count > 0)
             {
 
-                Console.Write("1 - name;2 - salary;0 - end: ");
+                Console.WriteLine("1 - name");
+                Console.WriteLine("2 - salary");
+                Console.WriteLine("0 - end");
 
                 while (true)
                 {
-
+                    Console.Write("To Edit:");
                     int now = int.Parse(Console.ReadLine());
                     if (now == 0)
                     {
@@ -180,6 +185,12 @@ namespace WorkManager
                 }
 
             }
+            else
+            {
+                Console.Clear();
+                Console.WriteLine("Worker not found");
+                Console.WriteLine();
+            }
 
         }
         public void DisplayBy(string izbor)
@@ -187,10 +198,13 @@ namespace WorkManager
 
             if (izbor.ToLower() == "all")
             {
-
+                Console.BackgroundColor = ConsoleColor.DarkBlue;
                 DisplayBy("CEO");
+                Console.BackgroundColor = ConsoleColor.DarkBlue;
                 DisplayBy("Manager");
+                Console.BackgroundColor = ConsoleColor.DarkBlue;
                 DisplayBy("Employee");
+                Console.BackgroundColor = ConsoleColor.Black;
 
 
             }
@@ -215,6 +229,7 @@ namespace WorkManager
                         }
                         counter--;
                         Console.WriteLine();
+                        Console.BackgroundColor = ConsoleColor.Black;
                         Console.WriteLine("Total CEOs: " + counter);
                         Console.WriteLine();
 
@@ -233,6 +248,7 @@ namespace WorkManager
                         }
                         counter--;
                         Console.WriteLine();
+                        Console.BackgroundColor = ConsoleColor.Black;
                         Console.WriteLine("Total Managers: " + counter);
                         Console.WriteLine();
 
@@ -251,6 +267,7 @@ namespace WorkManager
                         }
                         counter--;
                         Console.WriteLine();
+                        Console.BackgroundColor = ConsoleColor.Black;
                         Console.WriteLine("Total Employeis: " + counter);
                         Console.WriteLine();
 
@@ -354,14 +371,16 @@ namespace WorkManager
 
         }
 
-        public void DeptMenu()
+        public void DeptMenu(List<Department> deps)
         {
-
+            Console.WriteLine();
+            Console.WriteLine($"Current: {deps.FirstOrDefault().DName}");
             Console.WriteLine("------DEPT-MENU------>");
             Console.WriteLine("[A]Add Worker");
             Console.WriteLine("[R]Remove Worker");
             Console.WriteLine("[E]Edit Worker");
             Console.WriteLine("[D]Display(ALL,CEO,Manager,Employee)");
+            Console.WriteLine("[G]Change Department");
             Console.WriteLine("[B]Back)");
 
         }
@@ -377,10 +396,9 @@ namespace WorkManager
                 Console.Clear();
                 DisplayDepartments();
                 Console.WriteLine();
-                DeptMenu();
 
 
-                Console.Write("---Izberi filial: ");
+                Console.Write("Pick Department: ");
                 string name = Console.ReadLine();
                 List<Department> deps = Departments.Where(n => n.DName == name).ToList();
                 if (name == "end")
@@ -396,7 +414,7 @@ namespace WorkManager
 
                     while (true)
                     {
-
+                        DeptMenu(deps);
                         Console.WriteLine("Enter Pick: ");
                         Console.WriteLine();
                         key = Console.ReadKey(intercept: true);
@@ -408,35 +426,61 @@ namespace WorkManager
                             return;
 
                         }
-                        switch (key.Key)
+                        else if (key.Key == ConsoleKey.A || key.Key == ConsoleKey.R || key.Key == ConsoleKey.V || key.Key == ConsoleKey.D || key.Key == ConsoleKey.E || key.Key == ConsoleKey.G)
                         {
 
-                            case ConsoleKey.A:
-                                deps[0].AddWorker(deps[0]);
-                                break;
+                            switch (key.Key)
+                            {
 
-                            case ConsoleKey.R:
-                                Console.Write("Enter name: ");
-                                string myName = Console.ReadLine();
-                                deps[0].RemoveWorker(myName);
-                                break;
+                                case ConsoleKey.A:
+                                    deps[0].AddWorker(deps[0]);
+                                    Console.Clear();
+                                    Console.WriteLine($"{deps[0].Workers.Last().Name} was added in {deps[0].DName}");
+                                    Console.WriteLine();
+                                    break;
 
-                            case ConsoleKey.E:
-                                Console.Write("Enter name: ");
-                                string myName1 = Console.ReadLine();
-                                deps[0].EditWorker(myName1);
-                                break;
+                                case ConsoleKey.R:
+                                    Console.Write("Enter name: ");
+                                    string myName = Console.ReadLine();
+                                    deps[0].RemoveWorker(myName);
+                                    break;
 
-                            case ConsoleKey.D:
-                                Console.WriteLine("[ALL,CEO,Manager,Employee] Pick: ");
-                                string pick = Console.ReadLine();
-                                Console.Clear();
-                                deps[0].DisplayBy(pick);
+                                case ConsoleKey.E:
 
-                                DeptMenu();
+                                    Console.Clear();
+                                    deps[0].DisplayBy("all");
+                                    Console.WriteLine();
+                                    Console.Write("Enter name: ");
+                                    string myName1 = Console.ReadLine();
+                                    deps[0].EditWorker(myName1);
+                                    break;
 
-                                break;
+                                case ConsoleKey.G:
 
+                                    Console.Clear();
+                                    DisplayDepartments();
+                                    Console.WriteLine();
+                                    Console.Write("Pick Department To Change: ");
+                                    string name2 = Console.ReadLine();
+                                    deps = Departments.Where(n => n.DName == name2).ToList();
+                                    break;
+
+                                case ConsoleKey.D:
+                                    Console.WriteLine("[ALL,CEO,Manager,Employee] Pick: ");
+                                    string pick = Console.ReadLine();
+                                    Console.Clear();
+                                    deps[0].DisplayBy(pick);
+
+                                    break;
+
+                            }
+
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("!!Wrong input!!");
+                            Console.WriteLine();
                         }
 
                     }
